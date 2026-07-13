@@ -1,0 +1,14 @@
+<Solution>
+  <Project Path="DotMailer.AWSSES/DotMailer.AWSSES.csproj" />
+  <Project Path="DotMailer.AzureCommunication/DotMailer.AzureCommunication.csproj" />
+  <Project Path="DotMailer.Core/DotMailer.Core.csproj" />
+  <Project Path="DotMailer.Extensions.DependencyInjection/DotMailer.Extensions.DependencyInjection.csproj" />
+  <Project Path="DotMailer.Google/DotMailer.Google.csproj" />
+  <Project Path="DotMailer.Mailgun/DotMailer.Mailgun.csproj" />
+  <Project Path="DotMailer.Postmark/DotMailer.Postmark.csproj" />
+  <Project Path="DotMailer.Resend/DotMailer.Resend.csproj" />
+  <Project Path="DotMailer.SendGrid/DotMailer.SendGrid.csproj" />
+  <Project Path="DotMailer.SMTP/DotMailer.SMTP.csproj" />
+  <Project Path="DotMailer.Templates/DotMailer.Templates.csproj" />
+  <Project Path="DotMailer/DotMailer.csproj" />
+</Solution>
