@@ -15,6 +15,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Enable OIDC token issuance for Trusted Publishing
     
     steps:
     - uses: actions/checkout@v4
@@ -35,6 +37,11 @@ jobs:
         dotnet pack DotMailer.Core/DotMailer.Core.csproj --configuration Release --output nupkg
         dotnet pack DotMailer.SMTP/DotMailer.SMTP.csproj --configuration Release --output nupkg
     
+    - name: Authenticate to NuGet (Trusted Publishing)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: Govindkm
+    
     - name: Publish to NuGet.org
-      run: dotnet nuget push nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-      if: ${{ secrets.NUGET_API_KEY != '' }}
+      run: dotnet nuget push nupkg/*.nupkg --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
