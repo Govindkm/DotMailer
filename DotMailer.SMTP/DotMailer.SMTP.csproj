@@ -25,7 +25,12 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>email;smtp;transport;encryption;tls;authentication</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <LangVersion>14.0</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
 </Project>
