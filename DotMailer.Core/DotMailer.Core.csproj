@@ -12,8 +12,8 @@
     <Description>Core domain models and interfaces for the DotMailer email delivery system. Provides email message structures, interfaces, and type definitions.</Description>
     <Authors>Govind Kumar</Authors>
     <License>MIT</License>
-    <ProjectUrl>https://github.com/govindsmacneo/DotMailer</ProjectUrl>
-    <RepositoryUrl>https://github.com/govindsmacneo/DotMailer.git</RepositoryUrl>
+    <ProjectUrl>https://github.com/govindkm/DotMailer</ProjectUrl>
+    <RepositoryUrl>https://github.com/govindkm/DotMailer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>email;smtp;delivery;core;interfaces</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

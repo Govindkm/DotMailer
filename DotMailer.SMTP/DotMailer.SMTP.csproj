@@ -20,8 +20,8 @@
     <Description>Custom SMTP email transport for DotMailer. Provides direct SMTP protocol implementation with support for STARTTLS encryption and AUTH LOGIN authentication. No external dependencies - pure .NET implementation.</Description>
     <Authors>Govind Kumar</Authors>
     <License>MIT</License>
-    <ProjectUrl>https://github.com/govindsmacneo/DotMailer</ProjectUrl>
-    <RepositoryUrl>https://github.com/govindsmacneo/DotMailer.git</RepositoryUrl>
+    <ProjectUrl>https://github.com/govindkm/DotMailer</ProjectUrl>
+    <RepositoryUrl>https://github.com/govindkm/DotMailer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>email;smtp;transport;encryption;tls;authentication</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
