@@ -8,8 +8,10 @@ using DotMailer.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add logging
-builder.Logging.AddConsole();
+// Add logging with debug level
+builder.Logging
+    .AddConsole()
+    .SetMinimumLevel(LogLevel.Debug);
 
 // Add DotMailer with SMTP transport
 builder.Services.AddDotMailer(b =>

@@ -1,13 +1,10 @@
 using DotMailer.Core;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
 using Microsoft.Extensions.Logging;
 
 namespace DotMailer.SMTP;
 
 /// <summary>
-/// SMTP transport implementation using MailKit.
+/// SMTP transport implementation using a custom SMTP client.
 /// Sends emails via SMTP protocol to any SMTP server.
 /// </summary>
 public sealed class SmtpEmailTransport : IEmailTransport
@@ -30,36 +27,63 @@ public sealed class SmtpEmailTransport : IEmailTransport
 
         try
         {
-            var mimeMessage = ConvertToMimeMessage(message);
-            string messageId;
+            using var client = new SmtpClient(_logger);
 
-            using (var client = new SmtpClient())
+            _logger?.LogInformation("Connecting to SMTP server at {Host}:{Port}", _options.Host, _options.Port);
+
+            // Determine SSL/TLS settings
+            bool useSsl = _options.UseSsl;
+
+            // Connect to SMTP server
+            await client.ConnectAsync(
+                _options.Host,
+                _options.Port,
+                useSsl,
+                _options.ConnectionTimeout);
+
+            // Upgrade to TLS if requested (STARTTLS)
+            if (_options.UseStartTls && !useSsl)
             {
-                _logger?.LogInformation("Connecting to SMTP server at {Host}:{Port}", _options.Host, _options.Port);
-
-                // Connect to SMTP server
-                await client.ConnectAsync(
-                    _options.Host,
-                    _options.Port,
-                    _options.UseSsl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTlsWhenAvailable,
-                    cancellationToken);
-
-                // Authenticate
-                if (!string.IsNullOrWhiteSpace(_options.Username))
-                {
-                    _logger?.LogInformation("Authenticating as {Username}", _options.Username);
-                    await client.AuthenticateAsync(_options.Username, _options.Password, cancellationToken);
-                }
-
-                // Send message
-                _logger?.LogInformation("Sending email to {Recipients}", 
-                    string.Join(", ", message.To.Select(r => r.Address)));
-                
-                messageId = await client.SendAsync(mimeMessage, cancellationToken);
-
-                // Disconnect
-                await client.DisconnectAsync(true, cancellationToken);
+                _logger?.LogInformation("Upgrading connection to TLS with STARTTLS");
+                await client.StartTlsAsync(_options.Host);
             }
+
+            // Authenticate
+            if (!string.IsNullOrWhiteSpace(_options.Username))
+            {
+                _logger?.LogInformation("Authenticating as {Username}", _options.Username);
+                await client.AuthenticateAsync(_options.Username, _options.Password);
+            }
+
+            // Get sender address
+            var fromAddress = message.From?.Address ??
+                _options.DefaultFromAddress ??
+                throw new InvalidOperationException("No From address provided");
+
+            // Get recipient arrays
+            var toEmails = message.To.Select(r => r.Address).ToArray();
+            var ccEmails = message.Cc.Select(r => r.Address).ToArray();
+            var bccEmails = message.Bcc.Select(r => r.Address).ToArray();
+
+            // Build message bodies
+            var textBody = message.TextBody ?? string.Empty;
+            var htmlBody = message.HtmlBody ?? string.Empty;
+
+            // Send message
+            _logger?.LogInformation("Sending email to {Recipients}",
+                string.Join(", ", toEmails));
+
+            var messageId = await client.SendAsync(
+                fromAddress,
+                toEmails,
+                ccEmails,
+                bccEmails,
+                message.Subject,
+                textBody,
+                htmlBody);
+
+            // Disconnect
+            await client.DisconnectAsync();
 
             _logger?.LogInformation("Email sent successfully with message ID: {MessageId}", messageId);
             return EmailSendResult.Success(messageId);
@@ -70,71 +94,6 @@ public sealed class SmtpEmailTransport : IEmailTransport
             _logger?.LogError(ex, errorMessage);
             return EmailSendResult.Failure(errorMessage);
         }
-    }
-
-    private MimeMessage ConvertToMimeMessage(EmailMessage message)
-    {
-        var mimeMessage = new MimeMessage();
-
-        // From address
-        var fromAddress = message.From ?? 
-            new EmailAddress(
-                _options.DefaultFromAddress ?? throw new InvalidOperationException("No From address provided"),
-                _options.DefaultFromDisplayName);
-        
-        mimeMessage.From.Add(new MailboxAddress(fromAddress.DisplayName, fromAddress.Address));
-
-        // To recipients
-        foreach (var recipient in message.To)
-        {
-            mimeMessage.To.Add(new MailboxAddress(recipient.DisplayName, recipient.Address));
-        }
-
-        // CC recipients
-        foreach (var recipient in message.Cc)
-        {
-            mimeMessage.Cc.Add(new MailboxAddress(recipient.DisplayName, recipient.Address));
-        }
-
-        // BCC recipients
-        foreach (var recipient in message.Bcc)
-        {
-            mimeMessage.Bcc.Add(new MailboxAddress(recipient.DisplayName, recipient.Address));
-        }
-
-        // Reply-To
-        if (message.ReplyTo is not null)
-        {
-            mimeMessage.ReplyTo.Add(new MailboxAddress(message.ReplyTo.DisplayName, message.ReplyTo.Address));
-        }
-
-        // Subject
-        mimeMessage.Subject = message.Subject;
-
-        // Body
-        var bodyBuilder = new BodyBuilder();
-
-        if (!string.IsNullOrEmpty(message.TextBody))
-            bodyBuilder.TextBody = message.TextBody;
-
-        if (!string.IsNullOrEmpty(message.HtmlBody))
-            bodyBuilder.HtmlBody = message.HtmlBody;
-
-        // Attachments
-        foreach (var attachment in message.Attachments)
-        {
-            bodyBuilder.Attachments.Add(attachment.FileName, attachment.Content, new ContentType("application", "octet-stream"));
-        }
-
-        mimeMessage.Body = bodyBuilder.ToMessageBody();
-
-        // Custom headers
-        foreach (var header in message.Headers)
-        {
-            mimeMessage.Headers[header.Key] = header.Value;
-        }
-
-        return mimeMessage;
     }
 
     private void ValidateMessage(EmailMessage message)
