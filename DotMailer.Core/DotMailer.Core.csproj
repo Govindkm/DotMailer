@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     
     <!-- NuGet Package Metadata -->
-    <PackageId>DotMailer.Core</PackageId>
+    <PackageId>Govindkm.DotMailer.Core</PackageId>
     <Version>1.0.0-beta.4</Version>
     <Title>DotMailer Core</Title>
     <Description>Core domain models and interfaces for the DotMailer email delivery system. Provides email message structures, interfaces, and type definitions.</Description>
