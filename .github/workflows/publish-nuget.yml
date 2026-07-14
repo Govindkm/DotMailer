@@ -1,0 +1,40 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/DotMailer.Core.csproj'
+      - '**/DotMailer.SMTP.csproj'
+      - 'DotMailer.Core/**'
+      - 'DotMailer.SMTP/**'
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Pack NuGet packages
+      run: |
+        dotnet pack DotMailer.Core/DotMailer.Core.csproj --configuration Release --output nupkg
+        dotnet pack DotMailer.SMTP/DotMailer.SMTP.csproj --configuration Release --output nupkg
+    
+    - name: Publish to NuGet.org
+      run: dotnet nuget push nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      if: ${{ secrets.NUGET_API_KEY != '' }}
