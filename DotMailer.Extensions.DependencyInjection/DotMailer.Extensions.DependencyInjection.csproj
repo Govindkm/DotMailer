@@ -4,6 +4,21 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>Govindkm.DotMailer.Extensions.DependencyInjection</PackageId>
+    <Version>1.0.0-beta.6</Version>
+    <Title>DotMailer Dependency Injection Extensions</Title>
+    <Description>Dependency injection extensions for DotMailer. Provides convenient service registration for the DotMailer email delivery system with configuration support.</Description>
+    <Authors>Govind Kumar</Authors>
+    <License>MIT</License>
+    <ProjectUrl>https://github.com/govindkm/DotMailer</ProjectUrl>
+    <RepositoryUrl>https://github.com/govindkm/DotMailer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>email;dependency-injection;extensions;di</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <LangVersion>14.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +34,10 @@
   <ItemGroup>
     <ProjectReference Include="..\DotMailer.Core\DotMailer.Core.csproj" />
     <ProjectReference Include="..\DotMailer.SMTP\DotMailer.SMTP.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
